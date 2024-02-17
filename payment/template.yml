@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - dev.gear::payment
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  PaymentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dev.gear.StreamLambdaHandler::handleRequest
+      Runtime: java17
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /payment/{proxy+}
+            Method: any
+
+Outputs:
+  PaymentApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: PaymentApi
